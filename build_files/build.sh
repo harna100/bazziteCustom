@@ -10,7 +10,22 @@ set -ouex pipefail
 # https://mirrors.rpmfusion.org/mirrorlist?path=free/fedora/updates/39/x86_64/repoview/index.html&protocol=https&redirect=1
 
 # this installs a package from fedora repos
-dnf5 install -y tmux 
+dnf5 install -y tmux
+
+dnf install -y fedpkg
+fedpkg clone --anonymous kernel
+cd kernel
+fedpkg switch-branch f43
+usermod -a -G mock root
+newgrp -
+wget -O linux-kernel-test.patch https://github.com/torvalds/linux/commit/1fb710793ce2619223adffaf981b1ff13cd48f17.patch
+fedpkg mockbuild
+ls -R results_kernel
+ls results_kernel/6.17.7
+cd results_kernel/6.17.7/ba14.fc43
+rm *.src.rpm
+dnf install ./*.rpm
+
 
 # Use a COPR Example:
 #
